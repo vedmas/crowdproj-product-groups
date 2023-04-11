@@ -9,5 +9,6 @@ enum class ProductGroupStubs {
     BAD_DESCRIPTION,
     BAD_PROPERTIES,
     CANNOT_DELETE,
-    BAD_SEARCH_STRING
+    BAD_SEARCH_STRING,
+    DB_ERROR
 }

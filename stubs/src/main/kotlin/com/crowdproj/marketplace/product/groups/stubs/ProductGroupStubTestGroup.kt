@@ -10,7 +10,7 @@ object ProductGroupStubTestGroup {
             id = ProductGroupId("7"),
             name = "Test group 1",
             description = "Description test group 1",
-            properties = "17",
+            properties = "Prop!",
             deleted = false,
             permissionsClient = mutableSetOf(
                 ProductGroupPermissionClient.READ,

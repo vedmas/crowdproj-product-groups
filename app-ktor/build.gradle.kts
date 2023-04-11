@@ -64,6 +64,7 @@ kotlin {
                 implementation(project(":mappers"))
                 implementation(project(":api"))
                 implementation(project(":stubs"))
+                implementation(project(":biz"))
             }
         }
         @Suppress("UNUSED_VARIABLE")

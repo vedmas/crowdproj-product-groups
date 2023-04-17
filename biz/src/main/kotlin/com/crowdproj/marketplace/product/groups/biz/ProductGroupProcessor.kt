@@ -1,11 +1,11 @@
 package com.crowdproj.marketplace.product.groups.biz
 
+import com.crowdproj.kotlin.cor.rootChain
 import com.crowdproj.marketplace.product.groups.biz.groups.operation
 import com.crowdproj.marketplace.product.groups.biz.groups.stubs
 import com.crowdproj.marketplace.product.groups.biz.workers.*
 import com.crowdproj.marketplace.product.groups.common.ProductGroupContext
 import com.crowdproj.marketplace.product.groups.common.models.ProductGroupCommand
-import com.crowdproj.marketplace.product.groups.libcor.rootChain
 import stubDeleteSuccess
 
 class ProductGroupProcessor {

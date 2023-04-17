@@ -12,7 +12,6 @@ dependencies {
 
     implementation(project(":common"))
     implementation(project(":stubs"))
-    implementation(project(":lib-cor"))
     implementation("com.crowdproj:kotlin-cor:$kotlincor")
 
     implementation(kotlin("test-common"))

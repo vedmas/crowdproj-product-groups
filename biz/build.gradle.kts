@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     val coroutinesVersion: String by project
+    val kotlincor: String by project
 
     implementation(kotlin("stdlib-common"))
     implementation(kotlin("stdlib-jdk8"))
@@ -12,6 +13,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":stubs"))
     implementation(project(":lib-cor"))
+    implementation("com.crowdproj:kotlin-cor:$kotlincor")
 
     implementation(kotlin("test-common"))
     implementation(kotlin("test-annotations-common"))

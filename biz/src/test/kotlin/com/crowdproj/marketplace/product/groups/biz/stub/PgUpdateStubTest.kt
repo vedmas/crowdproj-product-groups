@@ -1,29 +1,29 @@
-package com.crowdproj.marketplace.product.groups.biz
+package com.crowdproj.marketplace.product.groups.biz.stub
 
+import com.crowdproj.marketplace.product.groups.biz.ProductGroupProcessor
 import com.crowdproj.marketplace.product.groups.common.ProductGroupContext
 import com.crowdproj.marketplace.product.groups.common.models.*
 import com.crowdproj.marketplace.product.groups.common.stubs.ProductGroupStubs
-import com.crowdproj.marketplace.product.groups.stubs.ProductGroupStub
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PgCreateStubTest {
+class PgUpdateStubTest {
 
     private val processor = ProductGroupProcessor()
-    val id = ProductGroupId("666")
-    val name = "name 666"
-    val description = "desc 666"
-    val properties = "17"
-    val deleted = false
+    private val id = ProductGroupId("777")
+    private val name = "name 123"
+    private val description = "desc 321"
+    private val properties = "Prop!"
+    private val deleted = false
 
     @Test
     fun create() = runTest {
 
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.CREATE,
+            command = ProductGroupCommand.UPDATE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.SUCCESS,
@@ -36,7 +36,7 @@ class PgCreateStubTest {
             ),
         )
         processor.exec(ctx)
-        assertEquals(ProductGroupStub.get().id, ctx.pgResponse.id)
+        assertEquals(id, ctx.pgResponse.id)
         assertEquals(name, ctx.pgResponse.name)
         assertEquals(description, ctx.pgResponse.description)
         assertEquals(properties, ctx.pgResponse.properties)
@@ -44,9 +44,24 @@ class PgCreateStubTest {
     }
 
     @Test
+    fun badId() = runTest {
+        val ctx = ProductGroupContext(
+            command = ProductGroupCommand.UPDATE,
+            state = ProductGroupState.NONE,
+            workMode = ProductGroupWorkMode.STUB,
+            stubCase = ProductGroupStubs.BAD_ID,
+            pgRequest = ProductGroup(),
+        )
+        processor.exec(ctx)
+        assertEquals(ProductGroup(), ctx.pgResponse)
+        assertEquals("id", ctx.errors.firstOrNull()?.field)
+        assertEquals("validation", ctx.errors.firstOrNull()?.group)
+    }
+
+    @Test
     fun badTitle() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.CREATE,
+            command = ProductGroupCommand.UPDATE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_NAME,
@@ -67,7 +82,7 @@ class PgCreateStubTest {
     @Test
     fun badDescription() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.CREATE,
+            command = ProductGroupCommand.UPDATE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_DESCRIPTION,
@@ -88,7 +103,7 @@ class PgCreateStubTest {
     @Test
     fun databaseError() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.CREATE,
+            command = ProductGroupCommand.UPDATE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.DB_ERROR,
@@ -104,10 +119,10 @@ class PgCreateStubTest {
     @Test
     fun badNoCase() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.CREATE,
+            command = ProductGroupCommand.UPDATE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
-            stubCase = ProductGroupStubs.BAD_ID,
+            stubCase = ProductGroupStubs.BAD_SEARCH_STRING,
             pgRequest = ProductGroup(
                 id = id,
                 name = name,

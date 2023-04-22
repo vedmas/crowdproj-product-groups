@@ -1,5 +1,6 @@
-package com.crowdproj.marketplace.product.groups.biz
+package com.crowdproj.marketplace.product.groups.biz.stub
 
+import com.crowdproj.marketplace.product.groups.biz.ProductGroupProcessor
 import com.crowdproj.marketplace.product.groups.common.ProductGroupContext
 import com.crowdproj.marketplace.product.groups.common.models.*
 import com.crowdproj.marketplace.product.groups.common.stubs.ProductGroupStubs
@@ -8,43 +9,44 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PgDeleteStubTest {
+class PgSearchStubTest {
 
     private val processor = ProductGroupProcessor()
-    private val id = ProductGroupId("1")
+    private val filter = ProductGroupFilter(name = "pg-7-01 pg-7-01", description = "desc pg-7-01 pg-7-01")
 
     @Test
-    fun delete() = runTest {
+    fun read() = runTest {
 
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.DELETE,
+            command = ProductGroupCommand.SEARCH,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.SUCCESS,
-            pgRequest = ProductGroup(
-                id = id,
-            ),
+            pgFilterRequest = filter,
         )
         processor.exec(ctx)
-
-        val stub = ProductGroupStub.get()
-        assertEquals(stub.id, ctx.pgResponse.id)
-        assertEquals(stub.name, ctx.pgResponse.name)
-        assertEquals(stub.description, ctx.pgResponse.description)
-        assertEquals(stub.properties, ctx.pgResponse.properties)
-        assertEquals(stub.deleted, ctx.pgResponse.deleted)
+        assertTrue(ctx.pgsResponse.size > 1)
+        val first = ctx.pgsResponse.firstOrNull() ?: fail("Empty response list")
+        assertTrue(first.name.contains(filter.name))
+        assertTrue(first.description.contains(filter.description))
+        with(ProductGroupStub.get()) {
+            assertEquals(properties, first.properties)
+            assertEquals(deleted, first.deleted)
+        }
     }
 
     @Test
     fun badId() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.DELETE,
+            command = ProductGroupCommand.SEARCH,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_ID,
-            pgRequest = ProductGroup(),
+            pgFilterRequest = filter,
         )
         processor.exec(ctx)
         assertEquals(ProductGroup(), ctx.pgResponse)
@@ -55,13 +57,11 @@ class PgDeleteStubTest {
     @Test
     fun databaseError() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.DELETE,
+            command = ProductGroupCommand.SEARCH,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.DB_ERROR,
-            pgRequest = ProductGroup(
-                id = id,
-            ),
+            pgFilterRequest = filter,
         )
         processor.exec(ctx)
         assertEquals(ProductGroup(), ctx.pgResponse)
@@ -71,13 +71,11 @@ class PgDeleteStubTest {
     @Test
     fun badNoCase() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.DELETE,
+            command = ProductGroupCommand.SEARCH,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_NAME,
-            pgRequest = ProductGroup(
-                id = id,
-            ),
+            pgFilterRequest = filter,
         )
         processor.exec(ctx)
         assertEquals(ProductGroup(), ctx.pgResponse)

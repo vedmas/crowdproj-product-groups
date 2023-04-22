@@ -1,12 +1,14 @@
 package com.crowdproj.marketplace.product.groups.biz
 
+import com.crowdproj.kotlin.cor.handlers.worker
 import com.crowdproj.kotlin.cor.rootChain
 import com.crowdproj.marketplace.product.groups.biz.groups.operation
 import com.crowdproj.marketplace.product.groups.biz.groups.stubs
+import com.crowdproj.marketplace.product.groups.biz.validation.*
 import com.crowdproj.marketplace.product.groups.biz.workers.*
 import com.crowdproj.marketplace.product.groups.common.ProductGroupContext
 import com.crowdproj.marketplace.product.groups.common.models.ProductGroupCommand
-import stubDeleteSuccess
+import com.crowdproj.marketplace.product.groups.common.models.ProductGroupId
 
 class ProductGroupProcessor {
 
@@ -24,6 +26,18 @@ class ProductGroupProcessor {
                     stubDbError("Имитация ошибки работы с БД")
                     stubNoCase("Ошибка: запрошенный стаб недопустим")
                 }
+                validation {
+                    worker("Копируем поля в adValidating") { adValidating = pgRequest.deepCopy() }
+                    worker("Очистка id") { adValidating.id = ProductGroupId.NONE }
+                    worker("Очистка заголовка") { adValidating.name = adValidating.name.trim() }
+                    worker("Очистка описания") { adValidating.description = adValidating.description.trim() }
+                    validateNameNotEmpty("Проверка, что заголовок не пуст")
+                    validateNameHasContent("Проверка символов")
+                    validateDescriptionNotEmpty("Проверка, что описание не пусто")
+                    validateDescriptionHasContent("Проверка символов")
+
+                    finishPgValidation("Завершение проверок")
+                }
             }
             operation("Получить объявление", ProductGroupCommand.READ) {
                 stubs("Обработка стабов") {
@@ -31,6 +45,14 @@ class ProductGroupProcessor {
                     stubValidationBadId("Имитация ошибки валидации id")
                     stubDbError("Имитация ошибки работы с БД")
                     stubNoCase("Ошибка: запрошенный стаб недопустим")
+                }
+                validation {
+                    worker("Копируем поля в adValidating") { adValidating = pgRequest.deepCopy() }
+                    worker("Очистка id") { adValidating.id = ProductGroupId(adValidating.id.asString().trim()) }
+                    validateIdNotEmpty("Проверка на непустой id")
+                    validateIdProperFormat("Проверка формата id")
+
+                    finishPgValidation("Успешное завершение процедуры валидации")
                 }
             }
             operation("Изменить объявление", ProductGroupCommand.UPDATE) {
@@ -42,6 +64,20 @@ class ProductGroupProcessor {
                     stubDbError("Имитация ошибки работы с БД")
                     stubNoCase("Ошибка: запрошенный стаб недопустим")
                 }
+                validation {
+                    worker("Копируем поля в adValidating") { adValidating = pgRequest.deepCopy() }
+                    worker("Очистка id") { adValidating.id = ProductGroupId(adValidating.id.asString().trim()) }
+                    worker("Очистка заголовка") { adValidating.name = adValidating.name.trim() }
+                    worker("Очистка описания") { adValidating.description = adValidating.description.trim() }
+                    validateIdNotEmpty("Проверка на непустой id")
+                    validateIdProperFormat("Проверка формата id")
+                    validateNameNotEmpty("Проверка на непустой заголовок")
+                    validateNameHasContent("Проверка на наличие содержания в заголовке")
+                    validateDescriptionNotEmpty("Проверка на непустое описание")
+                    validateDescriptionHasContent("Проверка на наличие содержания в описании")
+
+                    finishPgValidation("Успешное завершение процедуры валидации")
+                }
             }
             operation("Удалить объявление", ProductGroupCommand.DELETE) {
                 stubs("Обработка стабов") {
@@ -50,6 +86,14 @@ class ProductGroupProcessor {
                     stubDbError("Имитация ошибки работы с БД")
                     stubNoCase("Ошибка: запрошенный стаб недопустим")
                 }
+                validation {
+                    worker("Копируем поля в adValidating") {
+                        adValidating = pgRequest.deepCopy() }
+                    worker("Очистка id") { adValidating.id = ProductGroupId(adValidating.id.asString().trim()) }
+                    validateIdNotEmpty("Проверка на непустой id")
+                    validateIdProperFormat("Проверка формата id")
+                    finishPgValidation("Успешное завершение процедуры валидации")
+                }
             }
             operation("Поиск объявлений", ProductGroupCommand.SEARCH) {
                 stubs("Обработка стабов") {
@@ -57,6 +101,11 @@ class ProductGroupProcessor {
                     stubValidationBadId("Имитация ошибки валидации id")
                     stubDbError("Имитация ошибки работы с БД")
                     stubNoCase("Ошибка: запрошенный стаб недопустим")
+                }
+                validation {
+                    worker("Копируем поля в adFilterValidating") { adFilterValidating = pgFilterRequest.copy() }
+
+                    finishAdFilterValidation("Успешное завершение процедуры валидации")
                 }
             }
         }.build()

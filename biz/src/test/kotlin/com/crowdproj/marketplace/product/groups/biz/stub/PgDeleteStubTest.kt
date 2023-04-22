@@ -1,5 +1,6 @@
-package com.crowdproj.marketplace.product.groups.biz
+package com.crowdproj.marketplace.product.groups.biz.stub
 
+import com.crowdproj.marketplace.product.groups.biz.ProductGroupProcessor
 import com.crowdproj.marketplace.product.groups.common.ProductGroupContext
 import com.crowdproj.marketplace.product.groups.common.models.*
 import com.crowdproj.marketplace.product.groups.common.stubs.ProductGroupStubs
@@ -10,16 +11,16 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PgReadStubTest {
+class PgDeleteStubTest {
 
     private val processor = ProductGroupProcessor()
     private val id = ProductGroupId("1")
 
     @Test
-    fun read() = runTest {
+    fun delete() = runTest {
 
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.READ,
+            command = ProductGroupCommand.DELETE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.SUCCESS,
@@ -28,19 +29,19 @@ class PgReadStubTest {
             ),
         )
         processor.exec(ctx)
-        with(ProductGroupStub.get()) {
-            assertEquals(id, ctx.pgResponse.id)
-            assertEquals(name, ctx.pgResponse.name)
-            assertEquals(description, ctx.pgResponse.description)
-            assertEquals(properties, ctx.pgResponse.properties)
-            assertEquals(deleted, ctx.pgResponse.deleted)
-        }
+
+        val stub = ProductGroupStub.get()
+        assertEquals(stub.id, ctx.pgResponse.id)
+        assertEquals(stub.name, ctx.pgResponse.name)
+        assertEquals(stub.description, ctx.pgResponse.description)
+        assertEquals(stub.properties, ctx.pgResponse.properties)
+        assertEquals(stub.deleted, ctx.pgResponse.deleted)
     }
 
     @Test
     fun badId() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.READ,
+            command = ProductGroupCommand.DELETE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_ID,
@@ -55,7 +56,7 @@ class PgReadStubTest {
     @Test
     fun databaseError() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.READ,
+            command = ProductGroupCommand.DELETE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.DB_ERROR,
@@ -71,7 +72,7 @@ class PgReadStubTest {
     @Test
     fun badNoCase() = runTest {
         val ctx = ProductGroupContext(
-            command = ProductGroupCommand.READ,
+            command = ProductGroupCommand.DELETE,
             state = ProductGroupState.NONE,
             workMode = ProductGroupWorkMode.STUB,
             stubCase = ProductGroupStubs.BAD_NAME,

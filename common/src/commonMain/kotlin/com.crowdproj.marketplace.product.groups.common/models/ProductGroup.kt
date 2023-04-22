@@ -7,4 +7,9 @@ data class ProductGroup(
     var properties: String = "",
     var deleted: Boolean = false,
     val permissionsClient: MutableSet<ProductGroupPermissionClient> = mutableSetOf()
-)
+) {
+    fun deepCopy(): ProductGroup = copy(
+        permissionsClient = permissionsClient.toMutableSet(),
+    )
+
+}

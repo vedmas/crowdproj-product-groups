@@ -17,7 +17,7 @@ class MappersFromTransportTest {
                 stub = PgRequestDebugStubs.SUCCESS,
             ),
             pg = PgCreateObject(
-                name = "title",
+                name = "name",
                 description = "desc",
                 properties = "prop",
                 deleted = false,
